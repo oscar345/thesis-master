@@ -15,7 +15,6 @@ The repository contains the following files:
 - `main.py`: The file with which you can preprocess the data, train a tokenizer and BERT model, and plot statistics about the data and results of the model.
 - `requirements.txt`: The file with all the required packages to run the code.
 - `.tool-versions`: The file with the versions of programs used in this project. We only used Python 3.11.0. If you have `asdf` installed, you can run `asdf install` to install the correct version of Python.
-- `scores/`: The directory with the scores of the model per task and per model.
 
 ## Usage
 To run the code, you need to have Python 3.11.0 installed. When you have Python 3.11.0 installed, you can install the required packages by running the following command:
