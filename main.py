@@ -22,8 +22,6 @@ from fasttext.FastText import _FastText
 from sklearn.cluster import KMeans
 from tokenizers.implementations import BertWordPieceTokenizer
 
-# Sometimes import take a long time to load, so this is an indication for me whether the imports are
-# slow or whether the program itself takes a long time to run.
 print("Done importing libraries.")
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -106,12 +104,12 @@ def parse_arguments() -> argparse.Namespace:
         "plot-umbrella-example", help="plot the umbrella example"
     )
     _plot_results_parser = subparsers.add_parser(
-        "plot-results", help="plot the results of training the model (e.g. the loss)"
+        "plot-results", help="plot the results of the training"
     )
     get_scores_parser = subparsers.add_parser(
         "get-scores", help="get the scores of the models and organize them per task in a table"
     )
-    _debug_parser = subparsers.add_parser("debug", help="runs the code in the debug case")
+    _debug_parser = subparsers.add_parser("debug", help="debug the arguments")
 
     shared_defaults = {
         "vocab_size": 30522,
@@ -201,6 +199,11 @@ def parse_arguments() -> argparse.Namespace:
     )
 
     plot_stats_parser.add_argument("--output", type=str, required=True)
+    plot_stats_parser.add_argument(
+        "--show-increased-context-size",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
 
     # Arguments for plotting the data used for training
 
@@ -730,6 +733,7 @@ def basic_theme() -> lp.Dict:
 class PlotStatsConfig:
     input_dirs: list[str]
     output: str
+    show_increased_context_size: bool = False
 
 
 def plot_stats(config: PlotStatsConfig):
@@ -816,6 +820,25 @@ def plot_stats(config: PlotStatsConfig):
             panel_grid_minor_y=lp.element_line(color=LINE_COLORS["200"]),
         )
     )
+
+    if config.show_increased_context_size:
+        step_increase_context_size = df[df["increased_context_size"]]["step"].min()
+        plot = (
+            plot
+            + lp.geom_vline(
+                xintercept=step_increase_context_size,
+                linetype="dashed",
+                color=LINE_COLORS["600"],
+                size=0.5,
+            )
+            + lp.geom_label(
+                x=step_increase_context_size - 6000,
+                y=y_lims[1],
+                label="Increased Context Size",
+                color=LINE_COLORS["900"],
+                size=5,
+            )
+        )
 
     lp.ggsave(plot, filename="training_loss.png", path=config.output, scale=4)  # type: ignore
 
